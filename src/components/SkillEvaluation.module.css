@@ -1,0 +1,100 @@
+.container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.chartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.circularProgress {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Gradient border trick by pseudo element */
+.circularProgress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 10px; 
+  background: linear-gradient(135deg, var(--chart-blue) 0%, var(--chart-green) 100%); 
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.8;
+}
+
+
+.innerCircle {
+  width: 140px;
+  height: 140px;
+  background: var(--background);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.scoreValue {
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.scoreLabel {
+  font-size: 10px;
+  color: #9ca3af;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.statDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.statName {
+  color: #9ca3af;
+  flex: 1;
+}
+
+.statValue {
+  font-weight: 600;
+  color: #fff;
+}

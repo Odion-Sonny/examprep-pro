@@ -1,66 +1,74 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/Sidebar';
+import SkillEvaluation from '@/components/SkillEvaluation';
+import Gamification from '@/components/Gamification';
+import GapAnalysis from '@/components/GapAnalysis';
+import StudyPlan from '@/components/StudyPlan';
+import { Bell, Search, Settings } from 'lucide-react';
+import styles from './page.module.css';
 
 export default function Home() {
+  const router = useRouter();
+  const [studyPlanData, setStudyPlanData] = useState<any>(null);
+
+  useEffect(() => {
+    // Check if we just returned from a quiz
+    const recentPlan = localStorage.getItem('recentStudyPlan');
+    if (recentPlan) {
+      try {
+        setStudyPlanData(JSON.parse(recentPlan));
+      } catch (e) {}
+    }
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className={styles.main}>
+      <Sidebar />
+      
+      <div className={styles.content}>
+        <header className={styles.header}>
+          <div className={styles.userInfo}>
+            <div className={styles.avatar}>
+              <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Adebayo F." />
+            </div>
+            <div>
+              <h2 className={styles.userName}>Adebayo F.</h2>
+              <p className={styles.userRole}>JAMB/WAEC Candidate</p>
+            </div>
+          </div>
+          
+          <div className={styles.headerActions}>
+            <button className={styles.iconBtn} onClick={() => router.push('/quiz')}>
+               Take Diagnostic Quiz
+            </button>
+            <button className={styles.iconBtn}><Bell size={20} /></button>
+            <button className={styles.iconBtn}><Search size={20} /></button>
+            <button className={styles.iconBtn}><Settings size={20} /></button>
+          </div>
+        </header>
+
+        <section className={styles.welcomeSection}>
+          <h1 className={styles.welcomeTitle}>Good Morning, Adebayo!</h1>
+          <p className={styles.welcomeSubtitle}>Track your progress.</p>
+        </section>
+
+        <div className={styles.topRow}>
+          <div className={styles.evalColumn}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
+              <SkillEvaluation score={82} />
+              <Gamification />
+            </div>
+          </div>
+          <div className={styles.analysisColumn}>
+            <GapAnalysis />
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <StudyPlan dynamicPlan={studyPlanData} />
+      </div>
+    </main>
   );
 }
