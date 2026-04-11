@@ -4,7 +4,8 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function POST(req: Request) {
   try {
-    const { answers, failedTopics } = await req.json();
+    const { answers, failedTopics, subject } = await req.json();
+    const evaluatedSubject = subject || 'Mathematics';
 
     // Initialize Gemini AI
     const apiKey = process.env.GEMINI_API_KEY;
@@ -17,13 +18,13 @@ export async function POST(req: Request) {
 
     const prompt = `
       You are an expert tutor for WAEC and JAMB examinations in Nigeria.
-      A student has just taken a diagnostic Mathematics test and performed poorly in the following topics:
+      A student has just taken a diagnostic ${evaluatedSubject} test and performed poorly in the following topics:
       ${failedTopics.join(', ')}
 
       Generate a customized study plan for this student. Return a highly structured JSON array containing objects exactly matching this interface:
       {
         "title": "string (e.g. Focus Session, Targeted Practice)",
-        "topic": "string (e.g. Mathematics (Geometry))",
+        "topic": "string (e.g. ${evaluatedSubject} (Geometry))",
         "duration": "string (e.g. 45 min)",
         "priority": "string (high, medium, or low)",
         "iconName": "string (BookOpen, FlaskConical, PenTool, CheckCircle)"
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
       console.error("Gemini 503 or overload error, using fallback AI response:", apiErr);
       // Fallback response explicitly mimicking Gemini JSON format
       responseText = JSON.stringify([
-        { title: "Targeted Practice", topic: failedTopics[0] || "Mathematics", duration: "60 min", priority: "high", iconName: "BookOpen" },
+        { title: "Targeted Practice", topic: failedTopics[0] || evaluatedSubject, duration: "60 min", priority: "high", iconName: "BookOpen" },
         { title: "Skill Refinement", topic: failedTopics[1] || "General Review", duration: "45 min", priority: "medium", iconName: "PenTool" }
       ]);
     }
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
       .insert([
         { 
           user_id: user?.id,
-          subject: 'Mathematics',
+          subject: evaluatedSubject,
           overall_score: overallScore > 0 ? overallScore : 10,
           topic_breakdown: { failedTopics }
         }

@@ -1,8 +1,14 @@
+"use client";
+
 import Link from 'next/link';
-import { Home, BookOpen, FileText, PieChart, Calendar, User } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Home, BookOpen, FileText, PieChart, LogOut, Settings } from 'lucide-react';
+import { signout } from '@/app/login/actions';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
@@ -10,30 +16,34 @@ export default function Sidebar() {
       </div>
       
       <nav className={styles.nav}>
-        <Link href="/" className={`${styles.navItem} ${styles.active}`}>
+        <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>
           <Home size={20} />
           <span>Dashboard</span>
         </Link>
-        <Link href="#" className={styles.navItem}>
-          <BookOpen size={20} />
-          <span>Subjects</span>
-        </Link>
-        <Link href="#" className={styles.navItem}>
+        <Link href="/quiz" className={`${styles.navItem} ${pathname === '/quiz' ? styles.active : ''}`}>
           <FileText size={20} />
-          <span>Tests</span>
+          <span>Tests & Diagnosis</span>
         </Link>
-        <Link href="#" className={styles.navItem}>
-          <PieChart size={20} />
-          <span>Analysis</span>
+        <Link href="/practice" className={`${styles.navItem} ${pathname === '/practice' ? styles.active : ''}`}>
+          <BookOpen size={20} />
+          <span>Targeted Practice</span>
         </Link>
-        <Link href="#" className={styles.navItem}>
-          <Calendar size={20} />
-          <span>Plan</span>
-        </Link>
-        <Link href="#" className={styles.navItem}>
-          <User size={20} />
-          <span>Profile</span>
-        </Link>
+        
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button className={styles.navItem} style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit' }}>
+            <Settings size={20} />
+            <span>Settings</span>
+          </button>
+          
+          <button 
+            onClick={() => signout()} 
+            className={styles.navItem} 
+            style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: '#ef4444' }}
+          >
+            <LogOut size={20} />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </nav>
     </aside>
   );

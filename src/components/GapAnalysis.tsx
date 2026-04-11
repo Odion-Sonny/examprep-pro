@@ -3,20 +3,25 @@
 import { ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip } from 'recharts';
 import styles from './GapAnalysis.module.css';
 
+// For MVP, we still use some dummy graph data unless deep aggregation is calculated,
+// but the insights are driven cleanly by actual array inputs below.
 const data = [
-  { topic: 'Algebra', current: 80, goal: 100 },
-  { topic: 'Geometry', current: 40, goal: 90 },
-  { topic: 'Calculus', current: 60, goal: 85 },
-  { topic: 'Statistics', current: 90, goal: 95 },
-  { topic: 'Trigonometry', current: 50, goal: 80 },
-  { topic: 'Probability', current: 75, goal: 90 },
+  { topic: 'Topic 1', current: 80, goal: 100 },
+  { topic: 'Topic 2', current: 40, goal: 90 },
+  { topic: 'Topic 3', current: 60, goal: 85 },
+  { topic: 'Topic 4', current: 90, goal: 95 },
+  { topic: 'Topic 5', current: 50, goal: 80 },
+  { topic: 'Topic 6', current: 75, goal: 90 },
 ];
 
-export default function GapAnalysis() {
+export default function GapAnalysis({ weaknesses = [] }: { weaknesses?: string[] }) {
+  // Extract unique weaknesses and take top 3
+  const uniqueWeaknesses = Array.from(new Set(weaknesses)).slice(0, 3);
+  
   return (
     <div className={`glass-panel ${styles.container}`}>
       <div className={styles.header}>
-        <h3 className={styles.title}>Knowledge Gap Analysis (Maths)</h3>
+        <h3 className={styles.title}>Knowledge Gap Analysis</h3>
         <div className={styles.legend}>
           <div className={styles.legendItem}>
             <span className={styles.legendColor} style={{ background: 'var(--chart-blue)' }}></span>
@@ -45,9 +50,13 @@ export default function GapAnalysis() {
       </div>
       
       <div className={styles.insights}>
-        <div className={styles.weaknessTag}>Weakness: Geometry</div>
-        <div className={styles.weaknessTag}>Weakness: Trigonometry</div>
-        <div className={styles.strengthTag}>Strength: Statistics</div>
+        {uniqueWeaknesses.length > 0 ? (
+          uniqueWeaknesses.map((weakness, i) => (
+            <div key={i} className={styles.weaknessTag}>Weakness: {weakness}</div>
+          ))
+        ) : (
+          <div className={styles.strengthTag}>No obvious weaknesses found!</div>
+        )}
       </div>
     </div>
   );
