@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Clock, CheckCircle, BrainCircuit } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import toast from 'react-hot-toast';
 import styles from './page.module.css';
 
 const supabase = createClient(
@@ -39,7 +40,7 @@ export default function DiagnosticQuiz() {
     if (data && data.length > 0) {
       setQuestions(data);
     } else {
-      alert(`No questions found for ${selectedSubj} yet. Run the /api/seed-questions route!`);
+      toast.error(`No questions found for ${selectedSubj} yet. Run the /api/seed-questions route!`);
       setSubject(null);
     }
     setLoading(false);
@@ -93,6 +94,7 @@ export default function DiagnosticQuiz() {
       }
     } catch (err) {
       console.error("Error submitting to AI", err);
+      toast.error("Evaluation network timeout. Dashboard stats may be slightly delayed.");
     }
     
     router.push('/');

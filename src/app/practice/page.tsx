@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, Suspense } from 'react';
 import { ArrowLeft, BrainCircuit, Target, CheckCircle, Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import toast from 'react-hot-toast';
 import styles from './page.module.css';
 
 const supabase = createClient(
@@ -31,12 +32,14 @@ function PracticeContent() {
       const data = await res.json();
       if (data.success && data.questions) {
         setQuestions(data.questions);
+        toast.success("AI Micro-Drill generated successfully!");
       } else {
-        alert("Failed to generate AI drill. Returning to dashboard.");
+        toast.error("Failed to generate AI drill. Returning to dashboard.");
         router.push('/');
       }
     } catch (err) {
       console.error(err);
+      toast.error("Network error hitting Gemini.");
       router.push('/');
     }
     setLoading(false);
