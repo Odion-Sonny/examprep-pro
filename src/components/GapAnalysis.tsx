@@ -40,8 +40,8 @@ export default function GapAnalysis({ weaknesses = [] }: { weaknesses?: string[]
             <PolarGrid stroke="rgba(255,255,255,0.1)" />
             <PolarAngleAxis dataKey="topic" tick={{ fill: '#9ca3af', fontSize: 12 }} />
             <Tooltip 
-              contentStyle={{ background: 'rgba(15, 17, 26, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-              itemStyle={{ color: '#fff' }}
+              contentStyle={{ background: 'var(--background)', border: '1px solid var(--surface-border)', borderRadius: '8px' }}
+              itemStyle={{ color: 'var(--foreground)' }}
             />
             <Radar name="Goal" dataKey="goal" stroke="var(--chart-green)" fill="var(--chart-green)" fillOpacity={0.1} />
             <Radar name="Current Skills" dataKey="current" stroke="var(--chart-blue)" fill="var(--chart-blue)" fillOpacity={0.3} dot={{ r: 4, fill: 'var(--chart-blue)' }} />

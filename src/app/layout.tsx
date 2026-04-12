@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: 'Identify your knowledge gaps and build a personalized study guide for WAEC and JAMB.',
 };
 
+import { ThemeProvider } from '@/components/ThemeProvider';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

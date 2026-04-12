@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
-:root {
+:root, [data-theme='dark'] {
   --background: #0f111a;
   --foreground: #f3f4f6;
   
@@ -17,6 +17,15 @@
   
   --chart-blue: #0ea5e9;
   --chart-green: #22c55e;
+}
+
+[data-theme='light'] {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-border: rgba(0, 0, 0, 0.08);
+  --surface-hover: rgba(0, 0, 0, 0.04);
 }
 
 html {
