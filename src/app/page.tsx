@@ -25,6 +25,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [testResults, setTestResults] = useState<any[]>([]);
   const [studyPlans, setStudyPlans] = useState<any[]>([]);
+  const [gamification, setGamification] = useState<any>(null);
   const [userEmail, setUserEmail] = useState('Student');
 
   useEffect(() => {
@@ -32,16 +33,19 @@ export default function Home() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.email) {
-        // Grab just the username part
         setUserEmail(user.email.split('@')[0]);
       }
 
-      // Fetch all user results & plans (RLS protects so we get only theirs)
+      // Fetch all user results & plans
       const { data: results } = await supabase.from('test_results').select('*');
       const { data: plans } = await supabase.from('study_plans').select('*');
+      
+      // Fetch user profile gamification stats
+      const { data: gameStats } = await supabase.from('gamification').select('*').single();
 
       if (results) setTestResults(results);
       if (plans) setStudyPlans(plans);
+      if (gameStats) setGamification(gameStats);
 
       setLoading(false);
     }
@@ -135,6 +139,9 @@ export default function Home() {
             <button className={styles.iconBtn} style={{ background: 'var(--primary)' }} onClick={() => router.push('/quiz')}>
                Take {activeSubject} Quiz
             </button>
+            <div style={{ marginTop: '32px' }}>
+               <Gamification stats={gamification} />
+            </div>
           </div>
         ) : (
           <>
@@ -142,7 +149,7 @@ export default function Home() {
               <div className={styles.evalColumn}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
                   <SkillEvaluation score={averageScore} />
-                  <Gamification />
+                  <Gamification stats={gamification} />
                 </div>
               </div>
               <div className={styles.analysisColumn}>

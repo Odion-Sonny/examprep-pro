@@ -2,8 +2,14 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, Suspense } from 'react';
-import { ArrowLeft, BrainCircuit, Target, CheckCircle } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, Target, CheckCircle, Loader2 } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
 import styles from './page.module.css';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+);
 
 function PracticeContent() {
   const searchParams = useSearchParams();
@@ -11,23 +17,30 @@ function PracticeContent() {
   const topic = searchParams.get('topic') || 'General Revision';
   
   const [started, setStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [finished, setFinished] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
 
-  // Mock dynamic questions based on topic
-  const questions = [
-    {
-      text: `Which concept is fundamental to mastering ${topic}?`,
-      options: ["Memorizing historical dates", "Applying specific theorems", "Guessing randomly", "Writing essays"],
-      correct: 1
-    },
-    {
-      text: `In a standard WAEC exam, ${topic} questions usually test...`,
-      options: ["Your vocabulary", "Your analytical reasoning", "Your drawing skills", "Speed reading"],
-      correct: 1
+  const startDrillWorker = async () => {
+    setStarted(true);
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/drill?topic=${encodeURIComponent(topic)}`);
+      const data = await res.json();
+      if (data.success && data.questions) {
+        setQuestions(data.questions);
+      } else {
+        alert("Failed to generate AI drill. Returning to dashboard.");
+        router.push('/');
+      }
+    } catch (err) {
+      console.error(err);
+      router.push('/');
     }
-  ];
+    setLoading(false);
+  };
 
   const handleNext = () => {
     if (selectedOption !== null) {
@@ -35,13 +48,31 @@ function PracticeContent() {
         setCurrentIdx(currentIdx + 1);
         setSelectedOption(null);
       } else {
-        setFinished(true);
+        finishDrill();
       }
     }
   };
 
-  const handleFinish = () => {
-    router.push('/');
+  const finishDrill = async () => {
+    setFinished(true);
+    
+    // Increment Gamification points locally via Supabase RLS
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: currentStats } = await supabase.from('gamification').select('*').eq('user_id', user.id).single();
+      if (currentStats) {
+        await supabase.from('gamification').update({
+          points: currentStats.points + 50
+        }).eq('user_id', user.id);
+      } else {
+        await supabase.from('gamification').insert([{
+           user_id: user.id,
+           points: 50,
+           streak_days: 1,
+           tests_completed: 0
+        }]);
+      }
+    }
   };
 
   if (finished) {
@@ -49,9 +80,9 @@ function PracticeContent() {
       <div className={styles.container}>
         <div className={`glass-panel ${styles.finishCard}`}>
           <CheckCircle size={64} className={styles.successIcon} />
-          <h2>Practice Complete!</h2>
-          <p>You have earned +50 Points and extended your study streak!</p>
-          <button className={styles.primaryBtn} onClick={handleFinish}>
+          <h2>Drill Complete!</h2>
+          <p>You have earned <strong>+50 Points</strong> for completing an AI Targeted Practice session!</p>
+          <button className={styles.primaryBtn} onClick={() => router.push('/')} style={{ marginTop: '24px' }}>
             Return to Dashboard
           </button>
         </div>
@@ -68,12 +99,23 @@ function PracticeContent() {
         
         <div className={`glass-panel ${styles.introCard}`}>
           <div className={styles.iconWrapper}><Target size={40} /></div>
-          <h1 className={styles.title}>Targeted Practice</h1>
+          <h1 className={styles.title}>AI Targeted Practice</h1>
           <h2 className={styles.topicName}>{topic}</h2>
-          <p className={styles.desc}>Complete this micro-quiz to reinforce your knowledge, earn points, and decrease your knowledge gap in this specific area.</p>
-          <button className={styles.primaryBtn} onClick={() => setStarted(true)}>
-            Start 5-Minute Drill
+          <p className={styles.desc}>Complete this micro-quiz securely generated in real-time by Google Gemini to master this strict topic.</p>
+          <button className={styles.primaryBtn} onClick={startDrillWorker}>
+            Generate Micro-Drill
           </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (loading || questions.length === 0) {
+     return (
+      <div className={styles.container}>
+        <div className={`glass-panel`} style={{ padding: '40px', marginTop: '40px', textAlign: 'center' }}>
+          <Loader2 size={48} style={{ animation: 'spin 1s linear infinite', color: 'var(--primary)', marginBottom: '16px' }} />
+          <h2>Gemini is writing your questions...</h2>
         </div>
       </div>
     );
@@ -105,7 +147,7 @@ function PracticeContent() {
         <div className={`glass-panel ${styles.questionCard}`}>
           <h2 className={styles.questionText}>{question.text}</h2>
           <div className={styles.optionsList}>
-            {question.options.map((opt, idx) => (
+            {question.options.map((opt: string, idx: number) => (
               <button 
                 key={idx} 
                 className={`${styles.optionBtn} ${selectedOption === idx ? styles.selected : ''}`}

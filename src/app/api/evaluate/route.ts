@@ -97,6 +97,23 @@ export async function POST(req: Request) {
         ]);
         
       if (planError) console.error("Supabase Study Plan Insert Error:", planError);
+      
+      // 3. Increment Gamification Stats (Upsert equivalent)
+      const { data: currentStats } = await supabaseServer.from('gamification').select('*').eq('user_id', user?.id).single();
+      
+      if (currentStats) {
+        await supabaseServer.from('gamification').update({
+          points: currentStats.points + 100,
+          tests_completed: currentStats.tests_completed + 1
+        }).eq('user_id', user?.id!);
+      } else {
+        await supabaseServer.from('gamification').insert([{
+          user_id: user?.id!,
+          points: 100,
+          streak_days: 1,
+          tests_completed: 1
+        }]);
+      }
     }
 
     return NextResponse.json({ 
