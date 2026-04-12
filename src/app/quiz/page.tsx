@@ -25,6 +25,7 @@ export default function DiagnosticQuiz() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<{ questionId: string, selected: number }[]>([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(900); // 15 Minutes Baseline CBT constraint
 
   // 1. Fetch Questions for Subject
   const fetchQuestions = async (selectedSubj: string) => {
@@ -45,6 +46,21 @@ export default function DiagnosticQuiz() {
     }
     setLoading(false);
   };
+
+  // 1.5 CBT Timer Auto Submit Hook
+  useEffect(() => {
+    if (subject && !loading && !isFinished && questions.length > 0) {
+      if (timeLeft <= 0) {
+        toast.error("Time's up! Auto-submitting diagnostic evaluation.");
+        setIsFinished(true);
+        return;
+      }
+      const timerId = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timerId);
+    }
+  }, [subject, loading, isFinished, timeLeft, questions.length]);
 
   // 2. Submit Logic Hook
   useEffect(() => {
@@ -161,9 +177,9 @@ export default function DiagnosticQuiz() {
         <button className={styles.backBtn} onClick={() => setSubject(null)}>
           <ArrowLeft size={20} /> Back to Subjects
         </button>
-        <div className={styles.timer}>
+        <div className={styles.timer} style={{ color: timeLeft < 60 ? 'var(--danger)' : 'inherit', transition: 'color 0.3s' }}>
           <Clock size={18} />
-          <span>25:00</span>
+          <span>{Math.floor(timeLeft / 60).toString().padStart(2, '0')}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
         </div>
       </header>
 

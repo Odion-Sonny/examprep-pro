@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Home, BookOpen, FileText, LogOut, Settings } from 'lucide-react';
+import { Home, BookOpen, FileText, LogOut, Settings, Trophy } from 'lucide-react';
 import { signout } from '@/app/login/actions';
 import SettingsModal from './SettingsModal';
 import styles from './Sidebar.module.css';
@@ -31,6 +31,10 @@ export default function Sidebar() {
           <Link href="/practice" className={`${styles.navItem} ${pathname === '/practice' ? styles.active : ''}`}>
             <BookOpen size={20} />
             <span>Targeted Practice</span>
+          </Link>
+          <Link href="/leaderboard" className={`${styles.navItem} ${pathname === '/leaderboard' ? styles.active : ''}`}>
+            <Trophy size={20} />
+            <span>Leaderboard</span>
           </Link>
           
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>

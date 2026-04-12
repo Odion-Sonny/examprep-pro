@@ -24,7 +24,8 @@ export async function GET(req: Request) {
         {
           "text": "Question text here...",
           "options": ["Option A", "Option B", "Option C", "Option D"],
-          "correct_index": 0
+          "correct_index": 0,
+          "explanation": "A concise, 2-sentence explanation of why the correct option is right, helping the student learn instantly from their mistake."
         }
       ]
       

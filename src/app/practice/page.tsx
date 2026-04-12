@@ -22,6 +22,7 @@ function PracticeContent() {
   const [finished, setFinished] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
 
   const startDrillWorker = async () => {
@@ -45,14 +46,19 @@ function PracticeContent() {
     setLoading(false);
   };
 
+  const handleSubmit = () => {
+    if (selectedOption !== null && !showExplanation) {
+      setShowExplanation(true);
+    }
+  };
+
   const handleNext = () => {
-    if (selectedOption !== null) {
-      if (currentIdx < questions.length - 1) {
-        setCurrentIdx(currentIdx + 1);
-        setSelectedOption(null);
-      } else {
-        finishDrill();
-      }
+    if (currentIdx < questions.length - 1) {
+      setCurrentIdx(currentIdx + 1);
+      setSelectedOption(null);
+      setShowExplanation(false);
+    } else {
+      finishDrill();
     }
   };
 
@@ -150,25 +156,53 @@ function PracticeContent() {
         <div className={`glass-panel ${styles.questionCard}`}>
           <h2 className={styles.questionText}>{question.text}</h2>
           <div className={styles.optionsList}>
-            {question.options.map((opt: string, idx: number) => (
-              <button 
-                key={idx} 
-                className={`${styles.optionBtn} ${selectedOption === idx ? styles.selected : ''}`}
-                onClick={() => setSelectedOption(idx)}
-              >
-                <div className={styles.radioCircle}>
-                  {selectedOption === idx && <div className={styles.radioInner}></div>}
-                </div>
-                <span>{opt}</span>
-              </button>
-            ))}
+            {question.options.map((opt: string, idx: number) => {
+              let btnClass = styles.optionBtn;
+              if (selectedOption === idx) btnClass += ` ${styles.selected}`;
+              
+              if (showExplanation) {
+                if (idx === question.correct_index) {
+                  btnClass += ` ${styles.correctOption || ''}`;
+                } else if (idx === selectedOption) {
+                  btnClass += ` ${styles.wrongOption || ''}`;
+                }
+              }
+
+              return (
+                <button 
+                  key={idx} 
+                  className={btnClass}
+                  onClick={() => !showExplanation && setSelectedOption(idx)}
+                  disabled={showExplanation}
+                  style={showExplanation && idx === question.correct_index ? { border: '1px solid var(--success)', background: 'rgba(16, 185, 129, 0.1)' } : (showExplanation && idx === selectedOption ? { border: '1px solid var(--danger)', background: 'rgba(239, 68, 68, 0.1)' } : {})}
+                >
+                  <div className={styles.radioCircle}>
+                    {selectedOption === idx && <div className={styles.radioInner}></div>}
+                  </div>
+                  <span>{opt}</span>
+                </button>
+              );
+            })}
           </div>
+
+          {showExplanation && (
+            <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', borderLeft: '4px solid var(--primary)' }}>
+              <h4 style={{ color: 'var(--primary)', marginBottom: '8px', fontSize: '14px', textTransform: 'uppercase' }}>AI Explanation</h4>
+              <p style={{ fontSize: '15px', lineHeight: '1.5' }}>{question.explanation}</p>
+            </div>
+          )}
         </div>
 
         <div className={styles.footer}>
-          <button className={styles.primaryBtn} disabled={selectedOption === null} onClick={handleNext}>
-            {currentIdx === questions.length - 1 ? "Finish Drill" : "Next"}
-          </button>
+          {!showExplanation ? (
+            <button className={styles.primaryBtn} disabled={selectedOption === null} onClick={handleSubmit}>
+              Submit Answer
+            </button>
+          ) : (
+            <button className={styles.primaryBtn} onClick={handleNext}>
+              {currentIdx === questions.length - 1 ? "Finish Drill" : "Next Question"}
+            </button>
+          )}
         </div>
       </main>
     </div>
