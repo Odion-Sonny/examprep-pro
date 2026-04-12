@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, Tooltip } from 'recharts';
 import styles from './GapAnalysis.module.css';
 
@@ -52,7 +53,9 @@ export default function GapAnalysis({ weaknesses = [] }: { weaknesses?: string[]
       <div className={styles.insights}>
         {uniqueWeaknesses.length > 0 ? (
           uniqueWeaknesses.map((weakness, i) => (
-            <div key={i} className={styles.weaknessTag}>Weakness: {weakness}</div>
+            <Link href={`/practice?topic=${encodeURIComponent(weakness)}`} key={i} className={styles.weaknessTag}>
+              Fix Weakness: {weakness} ➔
+            </Link>
           ))
         ) : (
           <div className={styles.strengthTag}>No obvious weaknesses found!</div>

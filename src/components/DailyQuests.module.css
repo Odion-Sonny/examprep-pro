@@ -1,0 +1,98 @@
+.container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.header h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.questList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.questItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: var(--surface-hover);
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.questItem:hover {
+  background: var(--surface-border);
+  transform: translateX(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.finished {
+  opacity: 0.6;
+}
+
+.finished:hover {
+  transform: none;
+  background: var(--surface-hover);
+  border: 1px solid transparent;
+  cursor: default;
+}
+
+.questIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyCircle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px dashed #6b7280;
+}
+
+.questInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.questTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.questDesc {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.actionArrow {
+  font-size: 14px;
+  color: var(--primary);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s;
+}
+
+.questItem:hover .actionArrow {
+  opacity: 1;
+  transform: translateX(0);
+}

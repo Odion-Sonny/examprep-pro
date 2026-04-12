@@ -7,6 +7,8 @@ import SkillEvaluation from '@/components/SkillEvaluation';
 import Gamification from '@/components/Gamification';
 import GapAnalysis from '@/components/GapAnalysis';
 import StudyPlan from '@/components/StudyPlan';
+import PredictiveScore from '@/components/PredictiveScore';
+import DailyQuests from '@/components/DailyQuests';
 import { Bell, Search, Settings, Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import styles from './page.module.css';
@@ -148,12 +150,19 @@ export default function Home() {
             <div className={styles.topRow}>
               <div className={styles.evalColumn}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-                  <SkillEvaluation score={averageScore} />
+                  <PredictiveScore 
+                    points={gamification?.points || 0} 
+                    testsCompleted={gamification?.tests_completed || 0} 
+                  />
                   <Gamification stats={gamification} />
+                  <DailyQuests testsCompleted={gamification?.tests_completed || 0} />
                 </div>
               </div>
               <div className={styles.analysisColumn}>
-                <GapAnalysis weaknesses={aggregatedWeaknesses} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
+                  <SkillEvaluation score={averageScore} />
+                  <GapAnalysis weaknesses={aggregatedWeaknesses} />
+                </div>
               </div>
             </div>
 
